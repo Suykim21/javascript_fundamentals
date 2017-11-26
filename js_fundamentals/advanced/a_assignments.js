@@ -12,7 +12,7 @@ function each(arr, callback) {
     callback(arr[i]); // invoking the callback many times... delegation!
   }
 }
-Copy
+
 Your mission is to build your own version of the underscore library. Try to get as close as you can to what underscore provides for each example below. 
 
 To create your own custom JavaScript library, you will just add methods to a JS object! (Later on when we teach you about immediate functions you’ll see how to make this more robust to build libraries like jQuery!).
@@ -37,10 +37,10 @@ var _ = {
    }
  }
 // you just created a library with 5 methods!
-Copy
+
 var evens = _.filter([1, 2, 3, 4, 5, 6], function(num){ return num % 2 == 0; });
 console.log(evens); // if things are working right, this will return [2,4,6].
-Copy
+
 Hints:
 
 Look at _.filter when it is invoked.
@@ -58,6 +58,62 @@ Each method’s functionality is described here: underscore.js.
 Note that your method does not have to be as robust as underscore’s you just need to get the base functionality working. Therefore for most methods, you will only have the array and a callback as parameters and for the callback, you will pass in each element and potentially a “memo” also known as a “collector”.
 
 */
+
+const _ = {
+  map: function(array, callback) {
+    for (let i = 0; i < array.length; i++) {
+      array[i] = callback(array[i]);
+    }
+  },
+  reduce: function(array, callback, memo){
+      let el = 0;
+      if (!memo){
+        memo = array[0];
+        el = 1;
+      }
+      for (let i = el; i < array.length; i++) {
+        memo = callback(array[i], memo);
+      }
+      return memo;
+
+  },
+  find: function(array, callback) {
+    for (let i = 0; i < array.length; i++) {
+      if (callback(array[i])){
+        return array[i];
+      }
+    }
+  },
+  filter: function(array, callback) {
+    const tempArray = [];
+    for (let i = 0; i < array.length; i++) {
+      if (callback(array[i])) {
+        tempArray.push(array[i]);
+      }
+    }
+    // we could also modify the original array
+    return tempArray;
+  },
+  reject: function(array, callback) {
+    const tempArray = [];
+    for (let i = 0; i < array.length; i++) {
+      if (!callback(array[i])) {
+        tempArray.push(array[i]);
+      }
+    }
+    // we could also modify the original array
+    return tempArray;
+  },
+}
+
+const array = [3, 4, 5];
+_.map(array, function callback(x) { return x * 5; });
+console.log(array);
+console.log(_.reduce(array, function callback(x, memo) { return x + memo; }));
+console.log(_.find(array, function callback(x) { return x === 15; }));
+// note: we used named functions for clarity above, but we can also pass anonymous functions as the second parameter:
+console.log(_.filter(array, function(x) { return x > 20; }));
+
 
 
 /*
@@ -99,7 +155,7 @@ We will be using the GitHub API to hunt down online information about yourself. 
   "created_at": "2014-04-05T00:21:45Z",
   "updated_at": "2015-04-14T23:23:54Z"
 }
-Copy
+
 This is the URL we will be using in our API call: https://api.github.com/users/(your user name). Our goal is to display our name on the page using the GitHub API.
 
 Let’s get started with our request. As you may remember from the AJAX/API chapter, we send an API request using the $.get method from jQuery.
@@ -114,12 +170,27 @@ $.get("https://api.github.com/users/(... user name)", displayName)
 function displayName(data) {
   console.log(data);
 }
-Copy
+
 Your objective is to create a button that when clicked will send an API request to the GitHub API (see above) and will display your name in a tag below the button.
 
 Optional Use promises (either the q library or ES6) instead of callbacks.
 
 */
+
+$(document).ready(
+  function(){
+    $('button').click(function(){
+      // as soon as the AJAX request returns, displayName is invoked and passed data!
+      //https://api.jquery.com/jquery.get/
+      $.get('https://api.github.com/users/githubUserName', displayName);
+    });
+  function displayName(data){
+      if (data.name){
+        $('body').append("<p>"+data.name+"</p>");
+      }
+    }
+  }
+);
 
 /*
 
@@ -138,7 +209,7 @@ Make sure you wrap your code in an immediate function
 
 $Dojo("someIdForSomeButton").click(function() { console.log("The button was clicked!") });
 $Dojo("someOtherIdForSomeOtherButton").hover(function() { console.log("The button was hovered on!") });
-Copy
+
 Here are some hints that should help you get started:
 
 $Dojo should be a function that returns an object (an HTML element object)
@@ -153,10 +224,24 @@ DOMobject.addEventListener //takes in 2 parameters 1) the event 2) the callback 
 DOMobject.click
 DOMobject.mouseover
 DOMobject.mouseout
-Copy
+
 This assignment will integrate many of the concepts you have learned so far!
 
 */
+
+function $Dojo(id) {
+  this.myId = document.getElementById(id);
+  this.click = function (callback) {
+      this.myId.addEventListener("click", callback);
+  };
+
+  this.hover = function (hoverin, hoverout) {
+      this.myId.addEventListener("mouseover", hoverin);
+      this.myId.addEventListener("mouseout", hoverout);
+  };
+
+  return this;
+}
 
 
 /*
@@ -183,6 +268,29 @@ fibCounter() // should console.log "8"
 
 
 */
+
+function fib() {
+  let prev = 0;
+  let curr = 1;
+ 
+  function nacci() {
+    const temp = prev;
+ 
+    console.log(curr);
+ 
+    prev = curr;
+    curr = curr + temp;
+  }
+ 
+  return nacci
+ }
+ const fibCounter = fib();
+ fibCounter() // should console.log "1"
+ fibCounter() // should console.log "1"
+ fibCounter() // should console.log "2"
+ fibCounter() // should console.log "3"
+ fibCounter() // should console.log "5"
+ fibCounter() // should console.log "8"
 
 
 /*
@@ -254,7 +362,7 @@ Bower install jQuery, and include jquery before the main.js file.
 Add a button to the HTML body.
 
 <button name='button'>Click Me</button>
-Copy
+
 In your main.js file:
 
 // our test object
@@ -281,7 +389,7 @@ var newObject = {
 }
 // modify the button method to this:
 $('button').click(customObject.onClick.bind(newObject));
-Copy
+
 At this point, let’s grab a friend who is not working and explain bind to him or her!
 
 Bind also takes an optional argument. Let’s test it out!
@@ -328,7 +436,7 @@ var yB = new YellowBelt('mike', 40);
 var bB = new BlackBelt('charlie', 29);
 console.log(bB.name);
 console.log(yB.name);
-Copy
+
 In this way, you can inherit from multiple parents.
 
 Another use of call and apply: It allows us to use this, without constructing an object with new first:
@@ -342,7 +450,7 @@ var person = {
   language: 'JavaScript, duh!'
 };
 levelUp.call(person);
-Copy
+
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call
 
 */
